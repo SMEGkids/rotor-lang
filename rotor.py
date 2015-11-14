@@ -16,7 +16,7 @@
 #along with Rotor. 
 #If not, see <http://www.gnu.org/licenses/>.
 import math
-wheels=[{'N':(lambda stack: stack.append(math.log(stack.pop)))},{'N':(lambda stack: print('\n')}]
+wheels=[{'N':(lambda stack: stack.append(math.log(stack.pop)))},{'N':(lambda stack: print('\n'))}]
 special={}
 program=tokenise(input('>'))#british spelling all the way!
 currentwheel=0
