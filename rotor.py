@@ -17,11 +17,15 @@
 #If not, see <http://www.gnu.org/licenses/>.
 wheels={}
 special={}
-program=input('>')
+program=tokenise(input('>'))#british spelling all the way!
 currentwheel=0
 stack=[]
 for i in program:
-    if i=='>':
+    if '"' == i[0]:
+        stack.append(i[1:])
+    elif ' in i:
+        stack.append(i[1])
+    elif i=='>':
         currentwheel=(currentwheel+1)%len(wheels)
     elif i=='<':
         currentwheel=(currentwheel-1) if currentwheel!=0 else len(wheels)
@@ -29,4 +33,23 @@ for i in program:
         special[i](stack)
     elif i in wheels[currentwheel]:
         wheels[currentwheel][i](stack)
-        
+def tokenise(thing):
+    tokens=[]
+    mode="normal"
+    for i in thing:
+        if i=="'":
+            mode='pushchar'
+            tokens.append("'")
+        elif i=='"':
+            mode = 'pushstr' if mode=='normal' else mode='normal'
+            tokens.append('"') if mode=='pushstr'
+        if mode=='normal':
+            tokens.append(i)
+        elif mode=='pushchar':
+            tokens[-1]=tokens[-1]+i
+            mode='normal'
+        else:
+            tokens[-1]=tokens[-1]+i
+      
+    
+ 
