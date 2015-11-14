@@ -15,6 +15,7 @@
 #You should have received a copy of the GNU General Public License
 #along with Rotor. 
 #If not, see <http://www.gnu.org/licenses/>.
+import math
 wheels=[{'N':(lambda stack: stack.append(math.log(stack.pop)))},{'N':(lambda stack: print('\n')}]
 special={}
 program=tokenise(input('>'))#british spelling all the way!
@@ -23,7 +24,7 @@ stack=[]
 for i in program:
     if '"' == i[0]:
         stack.append(i[1:])
-    elif ' in i:
+    elif "'" in i:
         stack.append(i[1])
     elif i=='>':
         currentwheel=(currentwheel+1)%len(wheels)
