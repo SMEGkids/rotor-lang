@@ -4,6 +4,8 @@ Rotor is a stack-based golfing language inspired by CJam/GolfScript, Gibberish a
 
 Rotor is very much WIP - currently there is only one wheel (the math wheel). More to come later.
 
+The python version is currently just a framework and an untested one at that. DO NOT USE IF YOU VALUE YOUR SANITY.
+
 ## Running
 
 ``groovy Rotor.groovy <FILE> <<< INPUT``
