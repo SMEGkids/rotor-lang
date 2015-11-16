@@ -18,7 +18,7 @@
 import math
 wheels=[{'N':(lambda stack: stack.append(math.log(stack.pop)))},{'N':(lambda stack: print('\n'))}]
 special={}
-program=tokenise(input('>'))#british spelling all the way!
+program=tokenise(input('>>>'))#british spelling all the way!
 currentwheel=0
 stack=[]
 for i in program:
