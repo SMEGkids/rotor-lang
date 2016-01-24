@@ -72,7 +72,7 @@ import java.util.Arrays;
     ["z", "x.push(Math.round(x.pop()));"]
   ],
   [
-    ["N", "x.push(Rotor.newline);"]
+    ["N", "x.push(RotorEval.newline);"]
   ]
 ];
 @Field static char newline = '\n'
@@ -86,17 +86,17 @@ class Block {
   int codePointer = 0;
   def stack;
   def wheels;
-  public Block(String c) { code = c; stack = Rotor.stack; wheels = Rotor.wheels;}
+  public Block(String c) { code = c; stack = RotorEval.stack; wheels = RotorEval.wheels;}
 
   void parse() {
     for(;codePointer < code.length();codePointer++) {
       char instruction = code[codePointer];
       if(instruction == '<') {
-        if(Rotor.wheelPointer == 0) Rotor.wheelPointer = wheels.length-1;
-        else Rotor.wheelPointer--;
+        if(RotorEval-eval.wheelPointer == 0) RotorEval.wheelPointer = wheels.length-1;
+        else RotorEval.wheelPointer--;
       } else if(instruction == '>') {
-        if(Rotor.wheelPointer == wheels.length-1) Rotor.wheelPointer = 0;
-        else Rotor.wheelPointer++;
+        if(RotorEval.wheelPointer == wheels.length-1) RotorEval.wheelPointer = 0;
+        else RotorEval.wheelPointer++;
       } else if(instruction == '`') {
         String literal = "";
         for(codePointer++;codePointer < code.length();codePointer++) {
@@ -145,9 +145,10 @@ class Block {
         redefine(stack.pop(),stack.pop());
       } else if(instruction == '^') {
         def i = stack.pop();
-        if(i >= 0 && i < wheels.length) Rotor.wheelPointer = i;
+        if(i >= 0 && i < wheels.length) RotorEval.wheelPointer = i;
       } else if(instruction == '@') {
-        //Rotate
+        stack.push(stack[-3]);
+        stack.removeAt(stack.size()-4);
       } else if(instruction == '+') {
         stack.push(stack.pop() + stack.pop());
       } else if(instruction == '/') {
@@ -168,18 +169,19 @@ class Block {
       } else if(instruction == '.') {
 	     stack.push(stack[-2][stack.pop()]);
       } else if(instruction == ',') {
-        stack[-3][stack.pop()] = stack.pop();
+        stack[-2][stack.pop()] = stack.pop();
       } else if(instruction == '[') {
         for(Object o : stack.pop()) stack.push(o);
       } else if(instruction == ']') {
         def a = [];
         for(Object o : stack) a.push(o);
+        stack.clear();
         stack.push(a);
       } else if(instruction == '\\') {
         def b = stack.pop();
         def r = stack.pop()..stack.pop();
         for(int i : r) {
-          Rotor.reg = i;
+          RotorEval.reg = i;
           stack.push(i);
           b.parse();
         }
@@ -189,9 +191,9 @@ class Block {
       } else if(instruction == ';') {
         stack.pop();
       } else if(instruction == '&') {
-        Rotor.reg = stack[-1];
+        RotorEval.reg = stack[-1];
       } else if(instruction == '~') {
-        stack.push(Rotor.reg);
+        stack.push(RotorEval.reg);
       } else if(instruction == '{') {
         String literal = "";
         for(codePointer++; codePointer < code.length(); codePointer++) {
@@ -236,16 +238,16 @@ class Block {
   }
 
   void redefine(char c, int n) {
-    int index1 = Arrays.binarySearch(wheels[Rotor.wheelPointer],(String[])[c as String],comp);
+    int index1 = Arrays.binarySearch(wheels[RotorEval.wheelPointer],(String[])[c as String],comp);
     int index2 = Arrays.binarySearch(wheels[n],(String[])[c as String],comp);
     if(index1 >= 0 && index2 >= 0) {
-      wheels[Rotor.wheelPointer][index1][1] = wheels[n][index2][1];
+      wheels[RotorEval.wheelPointer][index1][1] = wheels[n][index2][1];
     }
   }
 
   void parseInstruction(char c) {
-    int index = Arrays.binarySearch(wheels[Rotor.wheelPointer],(String[])[c as String],comp);
-    if(index >= 0) Eval.xy(stack,Rotor.reg,wheels[Rotor.wheelPointer][index][1]);
+    int index = Arrays.binarySearch(wheels[RotorEval.wheelPointer],(String[])[c as String],comp);
+    if(index >= 0) Eval.xy(stack,RotorEval.reg,wheels[RotorEval.wheelPointer][index][1]);
   }
 
 }
@@ -259,12 +261,22 @@ class RotorComparer implements Comparator<String[]> {
 
 void stdin() {
   String text = System.in.text;
-  if(text.length() == 0 || text == "\n") return;
-  try {
-    stack.push(Eval.me(text));
-  } catch(Exception e) {
-    stack.push(text);
+  if(text.length() == 0 || text == "\n") { 
+    wheelPointer = 1;
+    return; 
   }
+  def result;
+  try {
+    result = Eval.me(text);
+  } catch(Exception e) {
+    result = text;
+  }
+  if(result instanceof String) {
+    wheelPointer = 1;
+  } else {
+    wheelPointer = 0;
+  }
+  stack.push(result);
 }
 
 code=new File(args[0]).text;
